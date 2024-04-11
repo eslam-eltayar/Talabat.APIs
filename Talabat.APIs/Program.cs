@@ -32,7 +32,7 @@ namespace Talabat.APIs
 
 			var app = webApplicationBuilder.Build();
 
-			
+
 
 
 			using var scope = app.Services.CreateScope();
@@ -48,12 +48,14 @@ namespace Talabat.APIs
 			try
 			{
 				await _dbContext.Database.MigrateAsync(); // Update Database
+
+				await ApplicationContextSeed.SeedAsync(_dbContext);
 			}
 			catch (Exception ex)
 			{
-                Console.WriteLine(ex);
-               //var logger = loggerFactory.CreateLogger<Program>();
-				//logger.LogError(ex, "An Error Has Been occured during apply the Migration");
+				// Console.WriteLine(ex);
+				var logger = loggerFactory.CreateLogger<Program>();
+				logger.LogError(ex, "An Error Has Been occured during apply the Migration");
 			}
 
 			#region Configure Kestrel Middlewares
