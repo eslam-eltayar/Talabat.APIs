@@ -6,8 +6,9 @@ namespace Talabat.APIs
 {
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
+
 			var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
 			#region Configure Services
@@ -26,13 +27,36 @@ namespace Talabat.APIs
 			{
 				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
 			});
-			
-			#endregion
 
+			#endregion
 
 			var app = webApplicationBuilder.Build();
 
-			#region Configure Kestrel Middelares
+			
+
+
+			using var scope = app.Services.CreateScope();
+
+			var services = scope.ServiceProvider;
+
+			var _dbContext = services.GetRequiredService<ApplicationDbContext>();
+			// Ask CLR for Creatig Object from DbContext Explicitly
+
+
+			var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+			try
+			{
+				await _dbContext.Database.MigrateAsync(); // Update Database
+			}
+			catch (Exception ex)
+			{
+                Console.WriteLine(ex);
+               //var logger = loggerFactory.CreateLogger<Program>();
+				//logger.LogError(ex, "An Error Has Been occured during apply the Migration");
+			}
+
+			#region Configure Kestrel Middlewares
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
@@ -46,7 +70,7 @@ namespace Talabat.APIs
 			//app.UseAuthorization();
 
 
-			app.MapControllers(); 
+			app.MapControllers();
 			#endregion
 
 			app.Run();
