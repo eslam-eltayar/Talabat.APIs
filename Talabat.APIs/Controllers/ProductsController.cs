@@ -10,7 +10,7 @@ namespace Talabat.APIs.Controllers
 		private readonly IGenericRepository<Product> _productsRepo;
 
 		public ProductsController(IGenericRepository<Product> productsRepo)
-        {
+		{
 			_productsRepo = productsRepo;
 		}
 
@@ -23,5 +23,19 @@ namespace Talabat.APIs.Controllers
 
 			return Ok(products);
 		}
-    }
+
+		// /api/products/1
+		[HttpGet("{id}")]
+		public async Task<ActionResult<Product>> GetProduct(int id)
+		{
+			var product = await _productsRepo.GetAsync(id);
+
+			if (product is null)
+				return NotFound(); // 404
+
+			return Ok(product); // 200
+		}
+
+
+	}
 }
