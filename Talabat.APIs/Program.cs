@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using Talabat.Infrastructure.Data;
+
 namespace Talabat.APIs
 {
 	public class Program
@@ -18,6 +21,12 @@ namespace Talabat.APIs
 			webApplicationBuilder.Services.AddEndpointsApiExplorer();
 			webApplicationBuilder.Services.AddSwaggerGen();
 
+
+			webApplicationBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
+			{
+				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
+			});
+			
 			#endregion
 
 
