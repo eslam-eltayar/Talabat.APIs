@@ -9,8 +9,9 @@ namespace Talabat.APIs.Helpers
         public MappingProfiles()
         {
             CreateMap<Product, ProductToReturnDto>()
-                .ForMember(d => d.Brand, o => o.MapFrom(S => S.Brand.Name))
-                .ForMember(d=> d.Category, o=> o.MapFrom(S=>S.Category.Name));
+                .ForMember(P => P.Brand, o => o.MapFrom(S => S.Brand.Name))
+                .ForMember(P=> P.Category, o=> o.MapFrom(S=>S.Category.Name))
+                .ForMember(P => P.PictureUrl, o=> o.MapFrom<ProductPictureUrlResolver>());
         }
     }
 }
