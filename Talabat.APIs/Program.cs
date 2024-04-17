@@ -1,6 +1,8 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Text.Json;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Helpers;
 using Talabat.APIs.Middlewares;
@@ -84,6 +86,7 @@ namespace Talabat.APIs
 
 
 			var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+			var logger = loggerFactory.CreateLogger<Program>();
 
 			try
 			{
@@ -94,12 +97,11 @@ namespace Talabat.APIs
 			catch (Exception ex)
 			{
 				// Console.WriteLine(ex);
-				var logger = loggerFactory.CreateLogger<Program>();
 				logger.LogError(ex, "An Error Has Been occured during apply the Migration");
 			}
 
 			#region Configure Kestrel Middlewares
-
+			
 			app.UseMiddleware<ExceptionMiddleware>();
 
 			// Configure the HTTP request pipeline.
