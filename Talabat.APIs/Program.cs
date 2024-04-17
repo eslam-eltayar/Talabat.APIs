@@ -111,6 +111,8 @@ namespace Talabat.APIs
 				app.UseSwaggerUI();
 			}
 
+			app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
 			app.UseHttpsRedirection();
 
 			//app.UseAuthorization();
@@ -118,6 +120,7 @@ namespace Talabat.APIs
 			app.UseStaticFiles();
 
 			app.MapControllers();
+
 			#endregion
 
 			app.Run();
