@@ -14,11 +14,18 @@ namespace Talabat.APIs.Controllers
 	public class ProductsController : BaseApiController
 	{
 		private readonly IGenericRepository<Product> _productsRepo;
+		private readonly IGenericRepository<ProductBrand> _brandsRepo;
+		private readonly IGenericRepository<ProductCategory> _categoriesRepo;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IGenericRepository<Product> productsRepo, IMapper mapper)
+		public ProductsController(IGenericRepository<Product> productsRepo,
+			IGenericRepository<ProductBrand> brandsRepo,
+			IGenericRepository<ProductCategory> categoriesRepo,
+			IMapper mapper)
 		{
 			_productsRepo = productsRepo;
+			_brandsRepo = brandsRepo;
+			_categoriesRepo = categoriesRepo;
 			_mapper = mapper;
 		}
 
@@ -39,8 +46,8 @@ namespace Talabat.APIs.Controllers
 
 		// /api/products/1
 		[HttpGet("{id}")]
-		[ProducesResponseType(typeof(ApiResponse),StatusCodes.Status200OK)]
-		[ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<Product>> GetProduct(int id)
 		{
 			var spec = new ProductWithBrandAndCategorySpecifications(id);
@@ -57,5 +64,20 @@ namespace Talabat.APIs.Controllers
 		}
 
 
+		[HttpGet("brands")] // GET: /api/products/brands
+		public async Task<ActionResult<IEnumerable<ProductBrand>>> GetBrands()
+		{
+			var brands = await _brandsRepo.GetAllAsync();
+
+			return Ok(brands);
+		}
+
+		[HttpGet("categories")] // GET: /api/products/categories
+		public async Task<ActionResult<IEnumerable<ProductCategory>>> GetCategories()
+		{
+			var categories = await _categoriesRepo.GetAllAsync();
+
+			return Ok(categories);
+		}
 	}
 }
