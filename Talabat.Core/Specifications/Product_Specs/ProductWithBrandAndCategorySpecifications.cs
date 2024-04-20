@@ -10,19 +10,19 @@ namespace Talabat.Core.Specifications.Product_Specs
 	public class ProductWithBrandAndCategorySpecifications : BaseSpecifications<Product>
 	{
 		// This Ctor will be used for creating an object, That will be used to -> Get All Products .
-		public ProductWithBrandAndCategorySpecifications(string? sort, int? brandId, int? categoryId)
+		public ProductWithBrandAndCategorySpecifications(ProductSpecParams productSpecParams)
 			: base(P =>
 
-					(!brandId.HasValue    || P.BrandId == brandId) &&
-					(!categoryId.HasValue || P.CategoryId == categoryId)
+					(!productSpecParams.BrandId.HasValue || P.BrandId == productSpecParams.BrandId) &&
+					(!productSpecParams.CategoryId.HasValue || P.CategoryId == productSpecParams.CategoryId)
 			)
 
 		{
 			AddIncludes();
 
-			if (!string.IsNullOrEmpty(sort))
+			if (!string.IsNullOrEmpty(productSpecParams.Sort))
 			{
-				switch (sort)
+				switch (productSpecParams.Sort)
 				{
 					case "priceAsc":
 						AddOrderBy(P => P.Price);
@@ -45,6 +45,8 @@ namespace Talabat.Core.Specifications.Product_Specs
 				AddOrderBy(P => P.Name);
 			}
 
+
+			ApplyPagination((productSpecParams.PageIndex - 1) * productSpecParams.PageSize, productSpecParams.PageSize);
 		}
 
 
@@ -60,6 +62,9 @@ namespace Talabat.Core.Specifications.Product_Specs
 			Includes.Add(P => P.Brand);
 			Includes.Add(P => P.Category);
 		}
+
+
+
 
 	}
 }
