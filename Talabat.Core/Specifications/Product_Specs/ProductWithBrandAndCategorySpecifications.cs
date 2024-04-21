@@ -12,7 +12,8 @@ namespace Talabat.Core.Specifications.Product_Specs
 		// This Ctor will be used for creating an object, That will be used to -> Get All Products .
 		public ProductWithBrandAndCategorySpecifications(ProductSpecParams productSpecParams)
 			: base(P =>
-
+					
+					(string.IsNullOrEmpty(productSpecParams.Search) || P.Name.ToLower().Contains(productSpecParams.Search))&&		
 					(!productSpecParams.BrandId.HasValue || P.BrandId == productSpecParams.BrandId) &&
 					(!productSpecParams.CategoryId.HasValue || P.CategoryId == productSpecParams.CategoryId)
 			)
