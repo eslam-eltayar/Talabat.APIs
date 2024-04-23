@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using System.Net;
 using System.Text.Json;
 using Talabat.APIs.Errors;
@@ -28,7 +29,7 @@ namespace Talabat.APIs
 			webApplicationBuilder.Services.AddControllers(); // Register Required Web APIs Services to the DI container
 
 			webApplicationBuilder.Services.AddSwaggerServices();
-			
+
 
 			webApplicationBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
 			{
@@ -37,6 +38,16 @@ namespace Talabat.APIs
 
 
 			webApplicationBuilder.Services.AddApplicationServices();
+
+			webApplicationBuilder.Services.AddSingleton<IConnectionMultiplexer>((servicProvider) =>
+			{
+
+				var connection = webApplicationBuilder.Configuration.GetConnectionString("Redis");
+				return ConnectionMultiplexer.Connect(connection);
+			});
+
+
+			
 
 			#endregion
 
@@ -66,7 +77,7 @@ namespace Talabat.APIs
 			}
 
 			#region Configure Kestrel Middlewares
-			
+
 			app.UseMiddleware<ExceptionMiddleware>();
 
 			// Configure the HTTP request pipeline.
