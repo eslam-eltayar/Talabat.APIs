@@ -2,7 +2,7 @@
 
 namespace Talabat.Core.Entities
 {
-	public class BasketItme
+	public class BasketItem
 	{
 		public int Id { get; set; }
 		public string ProductName { get; set; } = null!;

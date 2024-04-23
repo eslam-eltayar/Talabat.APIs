@@ -34,7 +34,7 @@ namespace Talabat.Infrastructure
 
 		public async Task<CustomerBasket?> UpdateBasketAsync(CustomerBasket basket)
 		{
-			var CreatedOrUpdated = await _database.StringSetAsync(basket.Id, JsonSerializer.Serialize<CustomerBasket>(basket));
+			var CreatedOrUpdated = await _database.StringSetAsync(basket.Id, JsonSerializer.Serialize(basket), TimeSpan.FromDays(30));
 			if (!CreatedOrUpdated) return null;
 
 			return await GetBasketAsync(basket.Id);
