@@ -11,6 +11,8 @@ namespace Talabat.APIs.Extentions
 	{
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services)
 		{
+			// Allow DI for IBasketRepository
+			services.AddScoped(typeof(IBasketRepository), typeof(BasketRepository));
 
 			services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
