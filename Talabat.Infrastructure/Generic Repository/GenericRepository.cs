@@ -13,9 +13,9 @@ namespace Talabat.Infrastructure
 {
 	public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 	{
-		private readonly ApplicationDbContext _dbContext;
+		private readonly StoreContext _dbContext;
 
-		public GenericRepository(ApplicationDbContext dbContext)
+		public GenericRepository(StoreContext dbContext)
 		{
 			_dbContext = dbContext;
 		}

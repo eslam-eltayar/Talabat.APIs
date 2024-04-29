@@ -11,6 +11,7 @@ using Talabat.APIs.Middlewares;
 using Talabat.Core.Entities;
 using Talabat.Core.Repositories.Contract;
 using Talabat.Infrastructure;
+using Talabat.Infrastructure._Identity;
 using Talabat.Infrastructure.Data;
 
 namespace Talabat.APIs
@@ -29,35 +30,38 @@ namespace Talabat.APIs
 			webApplicationBuilder.Services.AddControllers(); // Register Required Web APIs Services to the DI container
 
 			webApplicationBuilder.Services.AddSwaggerServices();
+			
+			webApplicationBuilder.Services.AddApplicationServices();
 
-
-			webApplicationBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
+			webApplicationBuilder.Services.AddDbContext<StoreContext>(options =>
 			{
 				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
 			});
 
-
-			webApplicationBuilder.Services.AddApplicationServices();
-
-			webApplicationBuilder.Services.AddSingleton<IConnectionMultiplexer>((servicProvider) =>
+			webApplicationBuilder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
 			{
-
-				var connection = webApplicationBuilder.Configuration.GetConnectionString("Redis");
-				return ConnectionMultiplexer.Connect(connection);
+				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
 			});
 
+            webApplicationBuilder.Services.AddSingleton<IConnectionMultiplexer>((servicesProvider) =>
+            {
+                var connection = webApplicationBuilder.Configuration.GetConnectionString("RedisConnection");
+                return ConnectionMultiplexer.Connect(connection);
+            });
 
-			
 
-			#endregion
+            #endregion
 
-			var app = webApplicationBuilder.Build();
+            var app = webApplicationBuilder.Build();
+
+			#region Apply All Pending Migrations [Update Database] and Data Seeding
 
 			using var scope = app.Services.CreateScope();
 
 			var services = scope.ServiceProvider;
 
-			var _dbContext = services.GetRequiredService<ApplicationDbContext>();
+			var _dbContext = services.GetRequiredService<StoreContext>();
+			var _identityDbContext = services.GetRequiredService<ApplicationIdentityDbContext>();
 			// Ask CLR for Creatig Object from DbContext Explicitly
 
 
@@ -68,13 +72,18 @@ namespace Talabat.APIs
 			{
 				await _dbContext.Database.MigrateAsync(); // Update Database
 
-				await ApplicationContextSeed.SeedAsync(_dbContext);
-			}
+				await StoreContextSeed.SeedAsync(_dbContext);
+
+				await _identityDbContext.Database.MigrateAsync();
+
+            }
 			catch (Exception ex)
 			{
 				// Console.WriteLine(ex);
 				logger.LogError(ex, "An Error Has Been occured during apply the Migration");
 			}
+
+			#endregion
 
 			#region Configure Kestrel Middlewares
 

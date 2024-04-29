@@ -10,7 +10,7 @@ using Talabat.Infrastructure.Data;
 
 namespace Talabat.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(StoreContext))]
     [Migration("20240411175842_ProductModule")]
     partial class ProductModule
     {
