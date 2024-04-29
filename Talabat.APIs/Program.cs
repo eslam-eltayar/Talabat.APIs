@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -9,39 +10,41 @@ using Talabat.APIs.Extentions;
 using Talabat.APIs.Helpers;
 using Talabat.APIs.Middlewares;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Identity;
 using Talabat.Core.Repositories.Contract;
 using Talabat.Infrastructure;
 using Talabat.Infrastructure._Identity;
+using Talabat.Infrastructure._Identity.DataSeed;
 using Talabat.Infrastructure.Data;
 
 namespace Talabat.APIs
 {
-	public class Program
-	{
-		public static async Task Main(string[] args)
-		{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
 
-			var webApplicationBuilder = WebApplication.CreateBuilder(args);
+            var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
-			#region Configure Services
+            #region Configure Services
 
-			// Add services to the DI container.
+            // Add services to the DI container.
 
-			webApplicationBuilder.Services.AddControllers(); // Register Required Web APIs Services to the DI container
+            webApplicationBuilder.Services.AddControllers(); // Register Required Web APIs Services to the DI container
 
-			webApplicationBuilder.Services.AddSwaggerServices();
-			
-			webApplicationBuilder.Services.AddApplicationServices();
+            webApplicationBuilder.Services.AddSwaggerServices();
 
-			webApplicationBuilder.Services.AddDbContext<StoreContext>(options =>
-			{
-				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
-			});
+            webApplicationBuilder.Services.AddApplicationServices();
 
-			webApplicationBuilder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
-			{
-				options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
-			});
+            webApplicationBuilder.Services.AddDbContext<StoreContext>(options =>
+            {
+                options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            webApplicationBuilder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
+            });
 
             webApplicationBuilder.Services.AddSingleton<IConnectionMultiplexer>((servicesProvider) =>
             {
@@ -50,64 +53,70 @@ namespace Talabat.APIs
             });
 
 
+            webApplicationBuilder.Services.AddIdentityServices();
+
             #endregion
 
             var app = webApplicationBuilder.Build();
 
-			#region Apply All Pending Migrations [Update Database] and Data Seeding
+            #region Apply All Pending Migrations [Update Database] and Data Seeding
 
-			using var scope = app.Services.CreateScope();
+            using var scope = app.Services.CreateScope();
 
-			var services = scope.ServiceProvider;
+            var services = scope.ServiceProvider;
 
-			var _dbContext = services.GetRequiredService<StoreContext>();
-			var _identityDbContext = services.GetRequiredService<ApplicationIdentityDbContext>();
-			// Ask CLR for Creatig Object from DbContext Explicitly
+            var _dbContext = services.GetRequiredService<StoreContext>();
+            var _identityDbContext = services.GetRequiredService<ApplicationIdentityDbContext>();
+            // Ask CLR for Creatig Object from DbContext Explicitly
 
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger<Program>();
 
-			var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-			var logger = loggerFactory.CreateLogger<Program>();
+            try
+            {
 
-			try
-			{
-				await _dbContext.Database.MigrateAsync(); // Update Database
+                await StoreContextSeed.SeedAsync(_dbContext);
 
-				await StoreContextSeed.SeedAsync(_dbContext);
+                await _dbContext.Database.MigrateAsync(); // Update Database
 
-				await _identityDbContext.Database.MigrateAsync();
+                var _userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+                await ApplicationIdentityDbContextSeed.SeedUserAsync(_userManager);
+
+                await _identityDbContext.Database.MigrateAsync();
 
             }
-			catch (Exception ex)
-			{
-				// Console.WriteLine(ex);
-				logger.LogError(ex, "An Error Has Been occured during apply the Migration");
-			}
+            catch (Exception ex)
+            {
+                // Console.WriteLine(ex);
+                logger.LogError(ex, "An Error Has Been occured during apply the Migration");
+            }
 
-			#endregion
+            #endregion
 
-			#region Configure Kestrel Middlewares
+            #region Configure Kestrel Middlewares
 
-			app.UseMiddleware<ExceptionMiddleware>();
+            app.UseMiddleware<ExceptionMiddleware>();
 
-			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
-			{
-				app.UseSwaggerMiddlewares();
-			}
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwaggerMiddlewares();
+            }
 
-			app.UseStatusCodePagesWithReExecute("/errors/{0}");
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
-			app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
-			//app.UseAuthorization();
+            //app.UseAuthorization();
 
-			app.UseStaticFiles();
+            app.UseStaticFiles();
 
-			app.MapControllers();
+            app.MapControllers();
 
-			#endregion
+            #endregion
 
-			app.Run();
-		}
-	}
+            app.Run();
+        }
+    }
 }
