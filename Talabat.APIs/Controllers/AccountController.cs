@@ -4,19 +4,23 @@ using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.DTOs;
 using Talabat.APIs.Errors;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Services;
 
 namespace Talabat.APIs.Controllers
 {
-    public class AccountController :BaseApiController
+    public class AccountController : BaseApiController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ITokenService _tokenService;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _tokenService = tokenService;
         }
         // 1. Register
 
@@ -26,7 +30,7 @@ namespace Talabat.APIs.Controllers
             var user = new ApplicationUser()
             {
                 DisplayName = model.DisplayName,
-                Email=model.Email,
+                Email = model.Email,
                 UserName = model.Email.Split('@')[0],
                 PhoneNumber = model.PhoneNumber
             };
@@ -38,8 +42,8 @@ namespace Talabat.APIs.Controllers
             var returnedUser = new UserDto()
             {
                 DisplayName = user.DisplayName,
-                Email= user.Email,
-                Token = "ThisWillBeTokenSoooon"
+                Email = user.Email,
+                Token = await _tokenService.CreateTokenAsync(user, _userManager)
             };
 
             return Ok(returnedUser);
@@ -56,13 +60,13 @@ namespace Talabat.APIs.Controllers
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
 
-            if(!result.Succeeded) return Unauthorized(new ApiResponse(401,"Invalid Login"));
+            if (!result.Succeeded) return Unauthorized(new ApiResponse(401, "Invalid Login"));
 
             return Ok(new UserDto()
             {
                 DisplayName = user.DisplayName,
                 Email = user.Email,
-                Token = "ThisWillBeTokenSooon"
+                Token = await _tokenService.CreateTokenAsync(user, _userManager)
             });
         }
 
