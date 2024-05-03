@@ -31,9 +31,9 @@ namespace Talabat.APIs.Extentions
                             ValidIssuer = configuration["JWT:ValidIssuer"],
                             ValidateAudience = true,
                             ValidAudience = configuration["JWT:ValidAudience"],
-                            ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:AuthKey"] ?? string.Empty)),
+                            ValidateLifetime = true,
                             ClockSkew = TimeSpan.Zero
                         };
 
