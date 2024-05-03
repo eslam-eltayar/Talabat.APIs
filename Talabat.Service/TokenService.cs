@@ -30,8 +30,8 @@ namespace Talabat.Application
 
             var authClaims = new List<Claim>()
             {
-                new Claim(ClaimTypes.GivenName, user.DisplayName),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Name, user.DisplayName),
+                new Claim(ClaimTypes.Email, user?.Email)
             };
 
             /// if user has a Role or more .. 
@@ -44,20 +44,20 @@ namespace Talabat.Application
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
+            var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? string.Empty));
 
 
-            var Token = new JwtSecurityToken(
+            var token = new JwtSecurityToken(
                 issuer : _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
+                expires: DateTime.Now.AddDays(double.Parse(_configuration["JWT:DurationInDays"] ?? "0")),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha256Signature)
 
                 );
 
 
-            return new JwtSecurityTokenHandler().WriteToken(Token);
+            return new JwtSecurityTokenHandler().WriteToken(token);
             
         }
     }

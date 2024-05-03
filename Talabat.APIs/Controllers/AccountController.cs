@@ -51,7 +51,7 @@ namespace Talabat.APIs.Controllers
 
         // 2. Login
 
-        [HttpPost("Login")] // POST: /api/Login
+        [HttpPost("login")] // POST: /api/login
 
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
         {
