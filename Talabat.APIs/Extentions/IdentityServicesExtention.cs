@@ -19,11 +19,8 @@ namespace Talabat.APIs.Extentions
             Services.AddIdentity<ApplicationUser, IdentityRole>()
                                           .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
 
-            Services.AddAuthentication(/*JwtBearerDefaults.AuthenticationScheme*/ options =>  // User Manager / SignIn Manager / RoleManager
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)   // User Manager / SignIn Manager / RoleManager
+            .AddJwtBearer(options =>
                     {
                         options.TokenValidationParameters = new TokenValidationParameters()
                         {

@@ -92,7 +92,7 @@ namespace Talabat.APIs.Controllers
                 DisplayName = user?.DisplayName ?? string.Empty,
                 Email = user?.Email ?? string.Empty,
                 Token = await _tokenService.CreateTokenAsync(user, _userManager)
-            }) ;
+            });
         }
 
 
@@ -107,6 +107,31 @@ namespace Talabat.APIs.Controllers
             return Ok(_mapper.Map<AddressDto>(user.Address));
         }
 
-        
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("address")] // PUT: /api/account/address
+        public async Task<ActionResult<Address>> UpdateUserAddress(AddressDto address)
+        {
+            var updatedAddress = _mapper.Map<Address>(address);
+
+            var user = await _userManager.FindUserWithAddressAsync(User);
+
+            updatedAddress.Id = user.Address.Id;
+
+            user.Address = updatedAddress;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new ApiValidationErrorResponse() { Errors = result.Errors.Select(E => E.Description) });
+            }
+
+            return Ok(address);
+
+
+
+        }
+
     }
 }
