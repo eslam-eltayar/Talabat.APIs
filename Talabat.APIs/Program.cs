@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Net;
 using System.Text.Json;
@@ -30,7 +31,11 @@ namespace Talabat.APIs
 
             // Add services to the DI container.
 
-            webApplicationBuilder.Services.AddControllers(); // Register Required Web APIs Services to the DI container
+            webApplicationBuilder.Services.AddControllers() // Register Required Web APIs Services to the DI container
+                                          .AddNewtonsoftJson(options=>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; // solve refernce looping
+            });
 
             webApplicationBuilder.Services.AddSwaggerServices();
 

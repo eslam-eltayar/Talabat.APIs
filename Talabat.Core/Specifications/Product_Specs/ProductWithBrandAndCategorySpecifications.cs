@@ -7,65 +7,76 @@ using Talabat.Core.Entities;
 
 namespace Talabat.Core.Specifications.Product_Specs
 {
-	public class ProductWithBrandAndCategorySpecifications : BaseSpecifications<Product>
-	{
-		// This Ctor will be used for creating an object, That will be used to -> Get All Products .
-		public ProductWithBrandAndCategorySpecifications(ProductSpecParams productSpecParams)
-			: base(P =>
-					
-					(string.IsNullOrEmpty(productSpecParams.Search) || P.Name.ToLower().Contains(productSpecParams.Search))&&		
-					(!productSpecParams.BrandId.HasValue || P.BrandId == productSpecParams.BrandId) &&
-					(!productSpecParams.CategoryId.HasValue || P.CategoryId == productSpecParams.CategoryId)
-			)
+    public class ProductWithBrandAndCategorySpecifications : BaseSpecifications<Product>
+    {
+        // This Ctor will be used for creating an object, That will be used to -> Get All Products .
+        public ProductWithBrandAndCategorySpecifications(ProductSpecParams productSpecParams)
+            : base(P =>
 
-		{
-			AddIncludes();
+                    (string.IsNullOrEmpty(productSpecParams.Search) || P.Name.ToLower().Contains(productSpecParams.Search)) &&
+                    (!productSpecParams.BrandId.HasValue || P.BrandId == productSpecParams.BrandId) &&
+                    (!productSpecParams.CategoryId.HasValue || P.CategoryId == productSpecParams.CategoryId)
+            )
 
-			if (!string.IsNullOrEmpty(productSpecParams.Sort))
-			{
-				switch (productSpecParams.Sort)
-				{
-					case "priceAsc":
-						AddOrderBy(P => P.Price);
-						break;
+        {
+            AddIncludes();
 
-					case "priceDesc":
-						AddOrderByDesc(P => P.Price);
-						break;
+            if (!string.IsNullOrEmpty(productSpecParams.Sort))
+            {
+                switch (productSpecParams.Sort)
+                {
+                    case "priceAsc":
+                        AddOrderBy(P => P.Price);
+                        break;
 
-					default:
-						AddOrderBy(P => P.Name);
-						break;
+                    case "priceDesc":
+                        AddOrderByDesc(P => P.Price);
+                        break;
 
-
-				}
-
-			}
-			else
-			{
-				AddOrderBy(P => P.Name);
-			}
+                    default:
+                        AddOrderBy(P => P.Name);
+                        break;
 
 
-			ApplyPagination((productSpecParams.PageIndex - 1) * productSpecParams.PageSize, productSpecParams.PageSize);
-		}
+                }
+
+            }
+            else
+            {
+                AddOrderBy(P => P.Name);
+            }
+
+            var pageIndexHelper = 0;
+
+            if ((productSpecParams.PageIndex - 1) < 0)
+            {
+                pageIndexHelper = 0;
+            }
+            else
+            {
+                pageIndexHelper = productSpecParams.PageIndex - 1;
+
+            }
+
+            ApplyPagination(pageIndexHelper * productSpecParams.PageSize, productSpecParams.PageSize);
+        }
 
 
-		// This Ctor will be used to creating an object, That will be used to -> Get Product with {id}
-		public ProductWithBrandAndCategorySpecifications(int id)
-			: base(P => P.Id == id)
-		{
-			AddIncludes();
-		}
+        // This Ctor will be used to creating an object, That will be used to -> Get Product with {id}
+        public ProductWithBrandAndCategorySpecifications(int id)
+            : base(P => P.Id == id)
+        {
+            AddIncludes();
+        }
 
-		private void AddIncludes()
-		{
-			Includes.Add(P => P.Brand);
-			Includes.Add(P => P.Category);
-		}
-
-
+        private void AddIncludes()
+        {
+            Includes.Add(P => P.Brand);
+            Includes.Add(P => P.Category);
+        }
 
 
-	}
+
+
+    }
 }
