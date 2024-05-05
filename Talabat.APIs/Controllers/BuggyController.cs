@@ -7,9 +7,9 @@ namespace Talabat.APIs.Controllers
 {
 	public class BuggyController : BaseApiController
 	{
-		private readonly ApplicationDbContext _dbContext;
+		private readonly StoreContext _dbContext;
 
-		public BuggyController(ApplicationDbContext dbContext)
+		public BuggyController(StoreContext dbContext)
         {
 			_dbContext = dbContext;
 		}

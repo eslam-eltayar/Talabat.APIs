@@ -8,9 +8,9 @@ using Talabat.Core.Entities;
 
 namespace Talabat.Infrastructure.Data
 {
-	public static class ApplicationContextSeed
+	public static class StoreContextSeed
 	{
-		public async static Task SeedAsync(ApplicationDbContext _dbContext)
+		public async static Task SeedAsync(StoreContext _dbContext)
 		{
 			// Product Brand Seeding
 			if ( _dbContext.ProductBrands.Count() == 0)
