@@ -22,11 +22,14 @@ namespace Talabat.Infrastructure._Data.Config.Order_Config
                         );
 
             builder.HasOne(order => order.DeliveryMethod)
-                   .WithMany();
+                   .WithMany()
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.Property(order => order.SubTotal).HasColumnType("decimal(12,2)");
 
-
+            builder.HasMany(order => order.Items)
+                    .WithOne()
+                    .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

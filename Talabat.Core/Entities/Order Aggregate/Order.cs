@@ -16,7 +16,7 @@ namespace Talabat.Core.Entities.Order_Aggregate
         public Address ShippingAddress { get; set; } = null!;
 
         //public int DeliveryMethodId { get; set; } // Foreign Key
-        public DeliveryMethod DeliveryMethod { get; set; } = null!; // Navigational Prop [ONE]
+        public DeliveryMethod? DeliveryMethod { get; set; } = null!; // Navigational Prop [ONE]
 
         public ICollection<OrderItem> Items { get; set; } = new HashSet<OrderItem>(); // Navigational Prop [MANY]
 
