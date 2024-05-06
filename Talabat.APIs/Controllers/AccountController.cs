@@ -9,7 +9,7 @@ using Talabat.APIs.DTOs;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Extentions;
 using Talabat.Core.Entities.Identity;
-using Talabat.Core.Services;
+using Talabat.Core.Services.Contract;
 
 namespace Talabat.APIs.Controllers
 {

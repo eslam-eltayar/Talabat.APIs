@@ -9,9 +9,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Talabat.Core.Entities.Identity;
-using Talabat.Core.Services;
+using Talabat.Core.Services.Contract;
 
-namespace Talabat.Application
+namespace Talabat.Application.TokenService
 {
     public class TokenService : ITokenService
     {
