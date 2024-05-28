@@ -9,7 +9,7 @@ namespace Talabat.Core.Services.Contract
 {
     public interface IOrderService
     {
-        Task<Order> CreateOrderAsync(string buyerEmail, string busketId, string deliveryMethod, Address shippingAddress);
+        Task<Order> CreateOrderAsync(string buyerEmail, string busketId, int deliveryMethodId, Address shippingAddress);
 
         Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail);
 
