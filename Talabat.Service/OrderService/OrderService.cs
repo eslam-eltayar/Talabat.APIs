@@ -36,7 +36,7 @@ namespace Talabat.Application.OrderService
             ///_deliveryMethodRepo = deliveryMethodRepo;
             ///_orderRepo = orderRepo;
         }
-        public async Task<Order?> CreateOrderAsync(string buyerEmail, string busketId, int deliveryMethodId, Address shippingAddress)
+        public async Task<Order?> CreateOrderAsync(string buyerEmail, string busketId, int deliveryMethodId, OrderAddress shippingAddress)
         {
             // 1.Get Basket From Baskets Repo
 

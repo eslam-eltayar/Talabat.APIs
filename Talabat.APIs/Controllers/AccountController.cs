@@ -102,19 +102,19 @@ namespace Talabat.APIs.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("address")] // GET: /api/Account/address
-        public async Task<ActionResult<AddressDto>> GetUserAddress()
+        public async Task<ActionResult<OrderAddressDto>> GetUserAddress()
         {
 
             var user = await _userManager.FindUserWithAddressAsync(User);
 
 
-            return Ok(_mapper.Map<AddressDto>(user.Address));
+            return Ok(_mapper.Map<OrderAddressDto>(user.Address));
         }
 
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("address")] // PUT: /api/account/address
-        public async Task<ActionResult<Address>> UpdateUserAddress(AddressDto address)
+        public async Task<ActionResult<Address>> UpdateUserAddress(OrderAddressDto address)
         {
             var updatedAddress = _mapper.Map<Address>(address);
 

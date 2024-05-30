@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Talabat.Core.Entities.Order_Aggregate
 {
-    public class Address
+    public class OrderAddress
     {
+       
         public required string FirstName { get; set; }
         public string LastName { get; set; } = null!;
         public string Street { get; set; } = null!;
