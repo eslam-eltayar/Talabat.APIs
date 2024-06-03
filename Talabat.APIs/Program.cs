@@ -53,7 +53,7 @@ namespace Talabat.APIs
 
             webApplicationBuilder.Services.AddSingleton<IConnectionMultiplexer>((servicesProvider) =>
             {
-                var connection = webApplicationBuilder.Configuration.GetConnectionString("RedisConnection");
+                var connection = webApplicationBuilder.Configuration.GetConnectionString("Redis");
                 return ConnectionMultiplexer.Connect(connection);
             });
 
