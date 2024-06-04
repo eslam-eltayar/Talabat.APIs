@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Talabat.APIs.DTOs;
 using Talabat.APIs.Errors;
 using Talabat.Core.Entities.Order_Aggregate;
@@ -36,8 +38,10 @@ namespace Talabat.APIs.Controllers
         }
 
         [HttpGet] // GET: /api/Orders
-        public async Task<ActionResult<IReadOnlyList<OrderToReturnDto>>> GetOrderForUser(string email)
+        [Authorize]
+        public async Task<ActionResult<IReadOnlyList<OrderToReturnDto>>> GetOrdersForUser()
         {
+            var email = User.FindFirstValue(ClaimTypes.Email) ?? String.Empty;
             var orders = await _orderService.GetOrdersForUserAsync(email);
 
             return Ok(_mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderToReturnDto>>(orders));
@@ -48,8 +52,11 @@ namespace Talabat.APIs.Controllers
         [ProducesResponseType(typeof(OrderToReturnDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [HttpGet("{id}")] // GET: /api/Orders/1?email=abc@mail.com
-        public async Task<ActionResult<OrderToReturnDto>> GetOrderForUser(int id, string email)
+        [Authorize]
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderForUser(int id)
         {
+            var email = User.FindFirstValue(ClaimTypes.Email) ?? String.Empty;
+
             var order = await _orderService.GetOrderByIdForUserAsync(id, email);
 
             if (order is null) return NotFound(new ApiResponse(404));
