@@ -87,19 +87,17 @@ namespace Talabat.Application.OrderService
 
             var result = await _unitOfWork.CompleteAsync();
 
-            return (result > 0) ? order : null; 
+            return (result > 0) ? order : null;
         }
 
-        public Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()
+        => await _unitOfWork.Repository<DeliveryMethod>().GetAllAsync();
 
         public Task<Order?> GetOrderByIdForUserAsync(int orderId, string buyerEmail)
         {
             var orderRepo = _unitOfWork.Repository<Order>();
 
-            var orderSpec = new OrderSpecifications(orderId, buyerEmail); 
+            var orderSpec = new OrderSpecifications(orderId, buyerEmail);
 
             var order = orderRepo.GetByIdWithSpecAsync(orderSpec);
 
