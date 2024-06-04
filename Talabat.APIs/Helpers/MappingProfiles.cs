@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using Talabat.APIs.DTOs;
 using Talabat.Core.Entities;
 using Talabat.Core.Entities.Identity;
@@ -23,8 +24,15 @@ namespace Talabat.APIs.Helpers
 
             CreateMap<Address, AddressDto>().ReverseMap();
 
-            
+            CreateMap<Order, OrderToReturnDto>()
+                .ForMember(d => d.DeliveryMethod, options => options.MapFrom(s => s.DeliveryMethod.ShortName))
+                .ForMember(d => d.DeliveryMethodCost, options => options.MapFrom(s => s.DeliveryMethod.Cost));
 
+            CreateMap<OrderItem, OrderItemDto>()
+                .ForMember(d => d.ProductId, options => options.MapFrom(s => s.Product.ProductId))
+                .ForMember(d => d.ProductName, options => options.MapFrom(s => s.Product.ProductName))
+                .ForMember(d => d.PictureUrl, options => options.MapFrom(s => s.Product.PictureUrl))
+                .ForMember(d=>d.PictureUrl, options=> options.MapFrom<OrderItemPictureUrlResolver>());
         }
     }
 }

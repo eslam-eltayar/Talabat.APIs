@@ -21,10 +21,10 @@ namespace Talabat.APIs.Controllers
             _mapper = mapper;
         }
 
-        [ProducesResponseType(typeof(Order) , StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OrderToReturnDto) , StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse) , StatusCodes.Status400BadRequest)]
         [HttpPost] // POST: /api/Orders
-        public async Task<ActionResult<Order>> CreateOrder(OrderDto orderDto)
+        public async Task<ActionResult<OrderToReturnDto>> CreateOrder(OrderDto orderDto)
         {
             var address = _mapper.Map<OrderAddressDto, OrderAddress>(orderDto.ShippingAddress);
 
@@ -32,15 +32,31 @@ namespace Talabat.APIs.Controllers
 
             if (order is null) return BadRequest(new ApiResponse(400));
 
-            return Ok(order);
+            return Ok(_mapper.Map<Order, OrderToReturnDto>(order));
         }
 
         [HttpGet] // GET: /api/Orders
-        public async Task<ActionResult<IReadOnlyList<Order>>> GetOrderForUser(string email)
+        public async Task<ActionResult<IReadOnlyList<OrderToReturnDto>>> GetOrderForUser(string email)
         {
             var orders = await _orderService.GetOrdersForUserAsync(email);
 
-            return Ok(orders);
+            return Ok(_mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderToReturnDto>>(orders));
         }
+
+
+
+        [ProducesResponseType(typeof(OrderToReturnDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [HttpGet("{id}")] // GET: /api/Orders/1?email=abc@mail.com
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderForUser(int id, string email)
+        {
+            var order = await _orderService.GetOrderByIdForUserAsync(id, email);
+
+            if (order is null) return NotFound(new ApiResponse(404));
+
+            return Ok(_mapper.Map<OrderToReturnDto>(order));
+        }
+
+
     }
 }
