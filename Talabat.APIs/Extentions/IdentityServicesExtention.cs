@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Talabat.Application;
+using Talabat.Application.TokenService;
 using Talabat.Core.Entities.Identity;
-using Talabat.Core.Services;
+using Talabat.Core.Services.Contract;
 using Talabat.Infrastructure._Identity;
 
 namespace Talabat.APIs.Extentions

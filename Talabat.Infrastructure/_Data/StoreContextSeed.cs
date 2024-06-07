@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Order_Aggregate;
 
 namespace Talabat.Infrastructure.Data
 {
@@ -13,9 +14,9 @@ namespace Talabat.Infrastructure.Data
 		public async static Task SeedAsync(StoreContext _dbContext)
 		{
 			// Product Brand Seeding
-			if ( _dbContext.ProductBrands.Count() == 0)
+			if (! _dbContext.ProductBrands.Any())
 			{
-				var brandsData = File.ReadAllText("../Talabat.Infrastructure/Data/DataSeed/brands.json");
+				var brandsData = File.ReadAllText("../Talabat.Infrastructure/_Data/DataSeed/brands.json");
 
 				var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandsData);
 
@@ -32,9 +33,9 @@ namespace Talabat.Infrastructure.Data
 			
 
 			// Product Category Seeding
-			if ( _dbContext.ProductCategories.Count() == 0)
+			if (! _dbContext.ProductCategories.Any())
 			{
-				var categoriesData = File.ReadAllText("../Talabat.Infrastructure/Data/DataSeed/categories.json");
+				var categoriesData = File.ReadAllText("../Talabat.Infrastructure/_Data/DataSeed/categories.json");
 
 				var categories = JsonSerializer.Deserialize<List<ProductCategory>>(categoriesData);
 
@@ -51,9 +52,9 @@ namespace Talabat.Infrastructure.Data
 			
 
 			// Product Seeding
-			if ( _dbContext.Products.Count() == 0)
+			if (! _dbContext.Products.Any())
 			{
-				var productsData = File.ReadAllText("../Talabat.Infrastructure/Data/DataSeed/products.json");
+				var productsData = File.ReadAllText("../Talabat.Infrastructure/_Data/DataSeed/products.json");
 
 				var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
@@ -66,7 +67,26 @@ namespace Talabat.Infrastructure.Data
 
 					await _dbContext.SaveChangesAsync();
 				}
-			} 
-		}
+			}
+
+
+			// DeliveryMethods Seeding
+            if (!_dbContext.DeliveryMethods.Any())
+            {
+                var delviryMethodsData = File.ReadAllText("../Talabat.Infrastructure/_Data/DataSeed/delivery.json");
+
+                var delviryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(delviryMethodsData);
+
+                if (delviryMethods?.Count > 0)
+                {
+                    foreach (var deliveryMethod in delviryMethods)
+                    {
+                        _dbContext.Set<DeliveryMethod>().Add(deliveryMethod);
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+        }
 	}
 }

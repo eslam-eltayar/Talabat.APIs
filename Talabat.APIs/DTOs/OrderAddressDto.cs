@@ -2,7 +2,7 @@
 
 namespace Talabat.APIs.DTOs
 {
-    public class AddressDto
+    public class OrderAddressDto
     {
         [Required]
 
