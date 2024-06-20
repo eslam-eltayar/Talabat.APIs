@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Helpers;
 using Talabat.Application.OrderService;
+using Talabat.Application.PaymentService;
 using Talabat.Application.ProductService;
 using Talabat.Core;
 using Talabat.Core.Repositories.Contract;
@@ -15,6 +16,8 @@ namespace Talabat.APIs.Extentions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddScoped(typeof(IPaymentService), typeof(PaymentService));
+
             services.AddScoped(typeof(IProductService), typeof(ProductService));
 
             services.AddScoped(typeof(IOrderService), typeof(OrderService));
