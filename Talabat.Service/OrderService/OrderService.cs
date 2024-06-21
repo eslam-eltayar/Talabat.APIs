@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stripe;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using Talabat.Core.Entities.Order_Aggregate;
 using Talabat.Core.Repositories.Contract;
 using Talabat.Core.Services.Contract;
 using Talabat.Core.Specifications.Order_Specs;
+using Product = Talabat.Core.Entities.Product;
 
 namespace Talabat.Application.OrderService
 {
@@ -16,6 +18,7 @@ namespace Talabat.Application.OrderService
     {
         private readonly IBasketRepository _basketRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPaymentService _paymentService;
 
         ///private readonly IGenericRepository<Product> _productRepo;
         ///private readonly IGenericRepository<DeliveryMethod> _deliveryMethodRepo;
@@ -23,25 +26,18 @@ namespace Talabat.Application.OrderService
 
         public OrderService(
             IBasketRepository basketRepo,
-            IUnitOfWork unitOfWork
-
-            ///IGenericRepository<Product> productRepo,
-            ///IGenericRepository<DeliveryMethod> deliveryMethodRepo,
-            ///IGenericRepository<Order> orderRepo
-            )
+            IUnitOfWork unitOfWork,
+            IPaymentService paymentService)
         {
             _basketRepo = basketRepo;
             _unitOfWork = unitOfWork;
-
-            ///_productRepo = productRepo;
-            ///_deliveryMethodRepo = deliveryMethodRepo;
-            ///_orderRepo = orderRepo;
+            _paymentService = paymentService;
         }
-        public async Task<Order?> CreateOrderAsync(string buyerEmail, string busketId, int deliveryMethodId, OrderAddress shippingAddress)
+        public async Task<Order?> CreateOrderAsync(string buyerEmail, string basketId, int deliveryMethodId, OrderAddress shippingAddress)
         {
             // 1.Get Basket From Baskets Repo
 
-            var basket = await _basketRepo.GetBasketAsync(busketId);
+            var basket = await _basketRepo.GetBasketAsync(basketId);
 
             // 2. Get Selected Items at Basket From Products Repo
 
@@ -70,6 +66,21 @@ namespace Talabat.Application.OrderService
 
             var deliveryMethod = await _unitOfWork.Repository<DeliveryMethod>().GetByIdAsync(deliveryMethodId);
 
+
+            var orderRepo = _unitOfWork.Repository<Order>();
+
+            /// Check if paymentIntent is Exist .. 
+            
+            var spec = new OrderWithPaymentIntentSpecification(basket?.PaymentIntentId);
+
+            var existingOrder = await orderRepo.GetByIdWithSpecAsync(spec);
+
+            if (existingOrder is not null)
+            {
+                orderRepo.Delete(existingOrder);
+                await _paymentService.CreateOrUpdatePaymentIntent(basketId);
+            }
+
             // 5. Create Order
 
             var order = new Order(
@@ -77,11 +88,13 @@ namespace Talabat.Application.OrderService
                 shippingAddress: shippingAddress,
                 deliveryMethodId: deliveryMethodId,
                 items: orderItems,
-                subTotal: subtotal
+                subTotal: subtotal,
+                paymentIntentId: basket?.PaymentIntentId ?? ""
+
                 );
 
 
-            _unitOfWork.Repository<Order>().Add(order);
+            orderRepo.Add(order);
 
             // 6. Save To Database [TODO]
 
