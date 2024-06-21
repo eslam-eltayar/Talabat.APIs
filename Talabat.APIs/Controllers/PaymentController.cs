@@ -19,7 +19,7 @@ namespace Talabat.APIs.Controllers
 
         [ProducesResponseType(typeof(CustomerBasket), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
-        [HttpGet("{basketid}")] // GET : /api/Payment/{basketid}
+        [HttpGet("{basketId}")] // GET : /api/Payment/{basketid}
         public async Task<ActionResult<CustomerBasket>> CreateOrUpdatePaymentIntent(string basketId)
         {
             var basket = await _paymentService.CreateOrUpdatePaymentIntent(basketId);
